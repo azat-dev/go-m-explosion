@@ -1,0 +1,5 @@
+scrape_configs:
+  - job_name: 'go-app'
+    scrape_interval: 1s # Собираем данные каждую секунду
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
