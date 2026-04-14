@@ -36,7 +36,7 @@ func main() {
 	runtime.GOMAXPROCS(2)
 
 	// Wait 30 seconds to establish a "baseline" in Grafana (idle state)
-	time.Sleep(30 * time.Second)
+	time.Sleep(40 * time.Second)
 
 	var wg sync.WaitGroup
 
