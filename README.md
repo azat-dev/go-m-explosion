@@ -52,7 +52,7 @@ Below is a high-resolution Grafana capture showing the transition from an idle s
 
 ### Prerequisites
 * Docker & Docker Compose
-* Go 1.21+
+* Go 1.26+
 * CGO enabled (e.g., `gcc` or `clang` installed)
 
 ### Reproduction Steps
