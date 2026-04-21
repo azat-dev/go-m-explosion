@@ -81,6 +81,33 @@ Below is a high-resolution Grafana capture showing the transition from an idle s
 
 ---
 
+## Proposed Solutions: 
+
+### Cooperative Concurrency Control:
+
+Move synchronization from the OS-level to the Go Runtime-level.
+
+- **Mechanism**:Use a buffered channel or a semaphore to limit the number of goroutines allowed to enter the "CGO danger zone" simultaneously.
+- **Behavior**: When the limit is reached, subsequent goroutines will call gopark and move to the synchronization object's wait queue.
+- **Outcome**: *P* resources remain fluid. sysmon observes healthy *P* states, effectively capping the number of OS threads to *$M \approx GOMAXPROCS + Workers$*.
+
+#### Semaphore solution:
+
+- **Run the experiment**
+```bash
+   cd ./cmd/solutionsemaphore
+   go run main.go
+```
+
+- **Graph**
+The graph demonstrates that only the first $N$ goroutines are allowed to execute the slow_call concurrently. The remaining goroutines are parked in the channel's wait queue, consuming minimal memory and zero additional OS threads. Once a slot is released, the scheduler unparks the next goroutine
+
+<p align="center">
+  <img src="./docs/img/solution-semaphore.png" width="900" title="Go Thread Explosion Timeline">
+</p>
+
+---
+
 ## Conclusion
 
 In high-performance systems (Fintech, HFT, Gateways), this behavior must be mitigated by:

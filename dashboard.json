@@ -5,8 +5,8 @@
     "name": "ad95wg4",
     "namespace": "default",
     "uid": "d213ed01-9d0b-428a-b4f9-c0b3a082c925",
-    "resourceVersion": "1776197259313997",
-    "generation": 9,
+    "resourceVersion": "1776784286564009",
+    "generation": 11,
     "creationTimestamp": "2026-04-14T19:38:16Z",
     "labels": {
       "grafana.app/deprecatedInternalID": "4007555986239488"
@@ -16,7 +16,7 @@
       "grafana.app/folder": "",
       "grafana.app/saved-from-ui": "Grafana v13.0.0 (e9de482b)",
       "grafana.app/updatedBy": "user:ffj3ct1j3bldsf",
-      "grafana.app/updatedTimestamp": "2026-04-14T20:07:39Z"
+      "grafana.app/updatedTimestamp": "2026-04-21T15:11:26Z"
     }
   },
   "spec": {
@@ -290,7 +290,11 @@
                         "color": "green"
                       },
                       {
-                        "value": 3,
+                        "value": 15,
+                        "color": "yellow"
+                      },
+                      {
+                        "value": 50,
                         "color": "dark-red"
                       }
                     ]
