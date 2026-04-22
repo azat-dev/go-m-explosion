@@ -1,23 +1,34 @@
 package main
 
-/*
-#include <unistd.h>
-// Simulated blocking C-function
-void slow_call() {
-    sleep(10); // Blocks the thread for 10 seconds
-}
-*/
 import "C"
 import (
+	"context"
+	"go-m-explosion/internal"
+	"log/slog"
 	"net/http"
+	"os"
 	"runtime"
-	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
+	ctx := context.Background()
+	log := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+
+	failedTransactions := prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "failed_transactions_total",
+			Help: "Total number of transactions rejected by the thread limiter",
+		},
+	)
+
+	prometheus.MustRegister(failedTransactions)
+
 	// Start Prometheus metrics server in a separate goroutine
 	// Access metrics at http://localhost:8080/metrics
 	go func() {
@@ -38,20 +49,9 @@ func main() {
 	// Wait 30 seconds to establish a "baseline" in Grafana (idle state)
 	time.Sleep(40 * time.Second)
 
-	var wg sync.WaitGroup
-
 	// STEP 2: Launch 100 "greedy" goroutines
-	// Each will invoke a blocking C-call, forcing the scheduler to spawn new system threads (M).
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			C.slow_call()
-		}()
-	}
-
-	// Wait for all blocking calls to complete
-	wg.Wait()
+	runner := internal.NewThreadExplosionRunner(log, failedTransactions.Inc)
+	runner.Run(ctx, internal.DoSlowCall)
 
 	// Keep the process alive for another 45 seconds
 	// This allows Prometheus to scrape the "post-explosion" state and cooldown.
